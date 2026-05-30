@@ -1,0 +1,51 @@
+{
+  "$schema": "https://fundingjson.org/schema/v1.1.0.json",
+  "version": "v1.1.0",
+  "entity": {
+    "type": "individual",
+    "role": "owner",
+    "name": "Tağmaç Çankaya",
+    "email": "tagmacc@gmail.com",
+    "phone": "+90 533 880 0870",
+    "description": "Independent maintainer in Lefkoşa, Cyprus (Republic of Cyprus / EU citizen). I build small, commons-aligned AGPLv3 tools for solo operators and small teams: Echo Toolkit (discovery), Cairn (token-efficient multi-agent coordination), and Khashif. A consistent discipline across fifteen years of civic, environmental, and digital work: efficiency through configuration, not brute force; ship something concrete and let it endure.",
+    "webpageUrl": {
+      "url": "https://khashif.run"
+    }
+  },
+  "projects": [
+    {
+      "guid": "cairn",
+      "name": "Cairn",
+      "description": "A free AGPLv3 coordination layer that lets multiple AI agents work together without burning the token budget, by coordinating through a passive shared blackboard and minimal per-agent context instead of conversation. Existing tooling is reactive (budget caps, observability); Cairn is preventive: it removes the unbounded-conversation structure that causes context and cost to explode. Measured on a controlled A/B (identical task, same model, only the context architecture changed): 54% fewer input tokens, 65% lower cost. The benchmark harness is published so the saving is reproducible. Framework-agnostic; composes with LangGraph and CrewAI. Also submitted to NLnet NGI Zero Commons (code 2026-06-385); FLOSS/fund support would fund maintenance, framework adapters, and the public benchmark.",
+      "webpageUrl": {
+        "url": "https://github.com/echo-toolkit/cairn"
+      },
+      "repositoryUrl": {
+        "url": "https://github.com/echo-toolkit/cairn"
+      },
+      "licenses": ["spdx:AGPL-3.0-or-later"],
+      "tags": ["ai", "llm", "multi-agent", "agentic-ai", "coordination", "token-efficiency", "developer-tools", "ai-safety", "python", "commons"]
+    }
+  ],
+  "funding": {
+    "channels": [
+      {
+        "guid": "bank-eu",
+        "type": "bank",
+        "description": "EU (Cyprus) bank transfer. Account details provided on request to the maintainer."
+      }
+    ],
+    "plans": [
+      {
+        "guid": "cairn-dev-grant",
+        "status": "active",
+        "name": "Cairn v1 development grant",
+        "description": "Fund 4 months of solo engineering: minimal-context core, stigmergic coordination, gardener orchestrator plus reproducible benchmark harness, framework adapters and docs. Milestone-deliverable.",
+        "amount": 30000,
+        "currency": "USD",
+        "frequency": "one-time",
+        "channels": ["bank-eu"]
+      }
+    ]
+  }
+}
