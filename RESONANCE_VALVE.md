@@ -9,8 +9,15 @@
 > Metaphor origin: synchronised pendulums (Huygens) + gong acoustics (strike → cacophony → swell).
 > The metaphor produced the design; the product no longer depends on it.
 >
-> **Deliberately out of scope:** any "intelligence emergence" claim — see §6. The target is
-> measurable token saving, not a revolution.
+> **What is optimised: YIELD = information value ÷ effort (tokens)** — NOT one-sided token cutting.
+> Tokens are the cost; reaching valuable information cheaply is the goal. The valve has two symmetric
+> errors, both lowering yield: cut early → kill the swell → lose value; cut late → chatter → waste
+> tokens. Optimum = the crest of the swell. (Nature's lesson: the gong's swell is the moment few synced
+> modes make a pure tone — max information; cut before it and you silence the tone, cut after and you
+> dwell on the decay.)
+>
+> **Deliberately out of scope:** any "intelligence emergence" claim — see §6. The target is measurable
+> yield, not a revolution.
 
 ---
 
@@ -123,6 +130,18 @@ turns — a dispatch that never produces anything (total dispersal) is cut as a 
 rather than waiting forever. The dR/dt framing in §3.2–3.3 is the intuition; the robust trigger is
 new-contribution flat. `w`, `eps`, `R_high`, `warmup_limit` are empirical — tuned by the live A/B
 (§4), not from the desk.
+
+**v3 — yield, not just saving (operator, 31 May 2026).** Token saving alone is one-sided; the valve
+optimises YIELD = value/effort. Three changes (`resonance_valve.py`, `RESONANCE_VALVE_PROOF2.md`):
+(1) **value-weighted contribution** — the trigger watches the *value* of new contributions, not their
+count (one late high-value anchor keeps the flow alive; five marginal repeats do not — volume ≠ value);
+(2) **double-gate adaptive w** — while value still flows, w stretches +1 (patient, don't kill a swell);
+once value goes quiet, w holds at base (cut); (3) **value-weighted R** = `0.5*convergence +
+0.5*min(1, cum_value/VALUE_FULL)` — high R means converged AND valuable. Backtest: protects the late
+valuable find (DISPATCH #005), +40% yield on chatter. **Honest trade-off:** the `eps_val` threshold
+between "low-but-real exploration" and "worthless chatter" is domain-specific and can mis-cut a late
+spike after a low-value patch — the exact knob the live A/B calibrates. No single safe constant; there
+is a calibration.
 
 ---
 
