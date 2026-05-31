@@ -113,6 +113,17 @@ on the blackboard — `_intercom_live.md` open-dispatch line carries `🎛️ va
 turn k++; new unique contribution resets k=0; at k≥2 the senior closes per the swell/plateau split.
 File-based state fits the stigmergic architecture exactly.
 
+**Post-backtest correction (v2.1 — `resonance_valve.py`, `RESONANCE_VALVE_PROOF2.md`):** the literal
+`dR/dt`-flat trigger above (v1) FAILED on real data — at real convergence R *jumps* (one-turn step,
+e.g. judge-pass R 0.5→1.0), and a rising derivative reset the patience counter so the valve missed the
+close. **The close trigger is therefore NEW-CONTRIBUTION flat, not dR/dt-flat**: `new_unique ≤ ε` for
+`w` turns. R's *level* at the trigger still selects swell (R high) vs plateau (R low). Plus a **bounded
+warmup**: until the first contribution arrives the valve is inactive, but only up to `warmup_limit`
+turns — a dispatch that never produces anything (total dispersal) is cut as a "no-traction plateau"
+rather than waiting forever. The dR/dt framing in §3.2–3.3 is the intuition; the robust trigger is
+new-contribution flat. `w`, `eps`, `R_high`, `warmup_limit` are empirical — tuned by the live A/B
+(§4), not from the desk.
+
 ---
 
 ## 4. A/B measurement — produces the product and the sales number at once
