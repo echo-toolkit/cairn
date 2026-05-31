@@ -97,7 +97,41 @@ per-turn value scores (0–4) are assigned, not measured. It shows the valve *wo
 turns into yield on a sprawling run, at a real token unit cost. It does NOT replace a live A/B where
 value is judge-scored on a real task and the run length is real, not assumed. Directional, not final.
 
-## Next step — live A/B (the real PROOF2), now yield-framed
+## Live run — DISPATCH #006 (executed 31 May 2026, real swarm, valve-ON)
+
+A real 2-worker swarm dispatch was run (Cairn distribution-channel research — real floor value, and
+open-ended enough to let the valve fire). Senior = live (this session). Real tokens measured from
+session JSONLs (`_bench_006.py`).
+
+**Measured:** 2 workers, **68 worker-turns, 4,609,888 billable input tokens, 67,792 / turn** — this
+matches #004's 69,877/turn within 3%, so **the counterfactual's token unit is validated on a fresh run.**
+
+**Valve behaviour — the honest headline:** the valve **never fired.** Audit-turn sequence: T2 DHC-1
+done (value 18) → RISING; T3 DHC-2 done (value 10, a *new* self-claimed angle — emergence) → RISING;
+T4 both workers went **idle on their own** ("yeni tur açmıyorum, idle") and the run exited. The valve
+was still at `FLAT 1/3` (double-gate kept it patient) when the workers self-terminated. **0 chatter
+turns, 0 turns to cut.**
+
+**What this proves (live confirmation of the overlap caveat):** on our own disciplined swarm
+(minimal-context + sharp filter + workers that stop when value ends), there is **no chatter for the
+valve to cut** — the workers self-regulate before the valve would even close. Mechanism #1
+(minimal-context) and worker self-discipline already prevent the waste mechanism #2 (the valve) is
+built to remove. **The valve's value is NOT on our dogfood swarm; it is on external sprawling sessions**
+(the counterfactual's intentional-long baseline: LangGraph/CrewAI runs that *don't* self-terminate).
+Claiming the valve saves tokens on our own swarm would be false — it doesn't, because there's nothing
+to save.
+
+**Honest product position after the live run:**
+- Counterfactual (sprawling baseline, validated token unit): **+71% yield, 42% turns cut, 0 value lost**
+  — the citable figure, scoped to *sprawling external swarms*.
+- Live dogfood: valve idle (0 cut) — our swarm doesn't need it; minimal-context already does the job.
+- So Cairn's two mechanisms are **sequenced, not additive on the same workload**: minimal-context for
+  disciplined swarms; the valve for the sprawling ones. Sell the valve to teams whose agents *don't*
+  self-terminate — not as a second saving on top of minimal-context.
+- Bonus: the run was not wasted quota — it produced 10 value-scored real distribution channels for
+  Cairn (`_dispatch_006_distribution.md`), actual floor work.
+
+## Next step — full A/B only if a buyer needs it
 
 Identical real task, two arms; measure **value AND tokens**, report **yield = value/token**:
 - **Arm A (valve OFF):** runs to natural/fixed close.

@@ -279,10 +279,24 @@ def counterfactual(seq, natural_idx, tpt=MEASURED_BILLABLE_INPUT_PER_TURN, **kw)
     print(f"  YIELD (value/token): {yb*1e6:.2f} -> {yv*1e6:.2f} per-M  ({'+' if yv>=yb else ''}{100*(yv-yb)/yb:.0f}%)")
 
 
+# LIVE — DISPATCH #006 (real run, 31 May 2026). Senior audit-turn sequence from the actual
+# 2-worker run. Real tokens: 68 worker-turns, 4,609,888 billable input, 67,792/turn (matches
+# #004's 69,877 within 3% — the counterfactual unit is validated). value = total value the audit
+# turn delivered (DHC-1 done value 18; DHC-2 done value 10; then both self-idle).
+DISPATCH_006_LIVE = [
+    TurnObs("T1 2×claimed",  2, 0, new_unique=0, value=0.0),
+    TurnObs("T2 DHC1 done",  2, 1, new_unique=6, value=18.0),
+    TurnObs("T3 DHC2 done",  2, 2, new_unique=4, value=10.0),
+    TurnObs("T4 both idle",  2, 2, new_unique=0, value=0.0),   # workers self-terminated; run exited
+]  # natural close = T4 (workers stopped themselves). natural_close_idx = 3.
+
+
 if __name__ == "__main__":
     print("CAIRN RESONANCE VALVE v3 — yield optimiser (value ÷ effort), not a one-sided cutter")
     print(f"params: w={W}, eps_val={EPS_VAL}, R_high={R_HIGH}, VALUE_FULL={VALUE_FULL}")
 
+    report("LIVE — DISPATCH #006 (real 2-worker run: did the valve need to fire?)",
+           DISPATCH_006_LIVE, natural_close_idx=3, trigger="value")
     report("REAL — DISPATCH #005 (track the valuable late find, don't kill it)",
            DISPATCH_005, natural_close_idx=3, trigger="value")
     report("SYNTHETIC — #005 + 3 chatter turns (value dried up -> cut)",
