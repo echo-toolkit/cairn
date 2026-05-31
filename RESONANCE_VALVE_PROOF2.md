@@ -72,6 +72,31 @@ dead-turn runs are genuinely chatter.
    marginal yield-gain on our disciplined swarm may be small; its real value is on sprawling LangGraph/
    CrewAI/AutoGen sessions. The live A/B must measure marginal yield *over* minimal-context.
 
+## Counterfactual result — yield on a sprawling baseline (cheap, zero new quota)
+
+Operator chose the cost-protective path: **measured token/turn × an intentional-long valve-less
+baseline.** Token/turn = **69,877** (real, DISPATCH #004: 9,014,101 billable input / 129 turns). The
+baseline (12 turns: value flows ~5 turns, converges, then 6 chatter turns) is **synthetic in
+turn-count** — our own swarm is low-chatter and rarely sprawls, but others' LangGraph/CrewAI sessions
+do; this is that regime. (`resonance_valve.py`, `counterfactual()`.)
+
+| metric | valve OFF (baseline) | valve ON (v3) |
+|---|---:|---:|
+| turns | 12 | 7 (closed T7) |
+| billable input tokens | 838,521 | 489,137 |
+| information value delivered | 7.5 | **7.5** |
+| **yield (value / M-token)** | 8.94 | **15.33** |
+
+- **Turns cut: 5 / 12 (42%). Tokens saved: 349,384 (42%).**
+- **Value lost to early close: 0.0** — the cut turns were the chatter, not the value. This is the
+  whole point: yield rose **without** sacrificing information.
+- **Yield: +71%** (value per token), with value held flat. The headline is yield, not "fewer tokens."
+
+**Honest scope of this counterfactual:** token/turn is measured; the baseline turn-count AND the
+per-turn value scores (0–4) are assigned, not measured. It shows the valve *would* convert chatter
+turns into yield on a sprawling run, at a real token unit cost. It does NOT replace a live A/B where
+value is judge-scored on a real task and the run length is real, not assumed. Directional, not final.
+
 ## Next step — live A/B (the real PROOF2), now yield-framed
 
 Identical real task, two arms; measure **value AND tokens**, report **yield = value/token**:

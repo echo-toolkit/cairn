@@ -32,6 +32,13 @@ R_HIGH = 0.55         # at-close R above this = SWELL, below = PLATEAU
 VALUE_FULL = 5.0      # cumulative value considered "enough information accrued" (R normaliser)
 WARMUP_LIMIT = 3      # max turns to wait for first contribution before declaring no-traction
 
+# Real measured per-turn cost, from DISPATCH #004 (`_dispatch_004_benchmark.md`):
+# 9,014,101 billable input tokens / 129 turns. Used as the counterfactual token unit so the
+# saving is grounded in a real run, not invented. (Our own swarm is low-chatter, so the
+# *long baseline* turn-count is synthetic — a sprawling valve-less session — while the
+# token-per-turn is measured. Honest hybrid; see RESONANCE_VALVE_PROOF2.md.)
+MEASURED_BILLABLE_INPUT_PER_TURN = 9_014_101 / 129  # ≈ 69,876
+
 
 @dataclass
 class TurnObs:
@@ -234,6 +241,44 @@ VALUE_VS_VOLUME = [
 ]  # natural_close_idx = 4.
 
 
+# Intentional-long baseline: a sprawling valve-LESS multi-agent session — value flows for the
+# first ~5 turns, converges, then 6 turns of chatter (workers re-posting, zero new value). This is
+# the regime the valve exists for and the kind of run others have on LangGraph/CrewAI; our own
+# disciplined swarm rarely produces it, so the turn-count is synthetic (token/turn is measured).
+LONG_BASELINE = [
+    TurnObs("T1 claimed",        4, 0, new_unique=0, value=0.0),
+    TurnObs("T2 first finds",    4, 1, new_unique=2, value=1.5),
+    TurnObs("T3 anchor",         4, 2, new_unique=3, value=3.0),
+    TurnObs("T4 develop",        4, 3, new_unique=2, value=2.0),
+    TurnObs("T5 taper",          4, 3, new_unique=1, value=1.0),
+    TurnObs("T6 judge-ish",      4, 4, new_unique=0, value=0.0),
+    TurnObs("T7 chatter",        4, 4, new_unique=0, value=0.0),
+    TurnObs("T8 chatter",        4, 4, new_unique=0, value=0.0),
+    TurnObs("T9 chatter",        4, 4, new_unique=0, value=0.0),
+    TurnObs("T10 chatter",       4, 4, new_unique=0, value=0.0),
+    TurnObs("T11 chatter",       4, 4, new_unique=0, value=0.0),
+    TurnObs("T12 chatter",       4, 4, new_unique=0, value=0.0),
+]  # natural (valve-less) close = T12. natural_close_idx = 11.
+
+
+def counterfactual(seq, natural_idx, tpt=MEASURED_BILLABLE_INPUT_PER_TURN, **kw):
+    st = run(seq, **kw)
+    vc = next((i for i, d in enumerate(st.decisions) if "CLOSE" in d[5] or "CUT" in d[5]), None)
+    if vc is None:
+        print("  valve never closed — no counterfactual saving"); return
+    tv, tb = vc + 1, natural_idx + 1
+    cut = tb - tv
+    tok_v, tok_b = tv * tpt, tb * tpt
+    val_v = sum(o.value for o in seq[:tv])
+    val_b = sum(o.value for o in seq[:tb])
+    yv, yb = val_v / tok_v, val_b / tok_b
+    print(f"  valve closes T{tv}/{tb} ({st.closed_reason})")
+    print(f"  turns cut: {cut}  |  tokens: {tok_b:,.0f} -> {tok_v:,.0f}  (saved {cut*tpt:,.0f}, "
+          f"{100*cut/tb:.0f}%)")
+    print(f"  value delivered: {val_b:.1f} -> {val_v:.1f}  (value lost to early close: {val_b-val_v:.1f})")
+    print(f"  YIELD (value/token): {yb*1e6:.2f} -> {yv*1e6:.2f} per-M  ({'+' if yv>=yb else ''}{100*(yv-yb)/yb:.0f}%)")
+
+
 if __name__ == "__main__":
     print("CAIRN RESONANCE VALVE v3 — yield optimiser (value ÷ effort), not a one-sided cutter")
     print(f"params: w={W}, eps_val={EPS_VAL}, R_high={R_HIGH}, VALUE_FULL={VALUE_FULL}")
@@ -264,3 +309,11 @@ if __name__ == "__main__":
             print(f"  w={w}: closes turn {vc+1}/7 ({st.closed_reason}) -> cuts {6-vc} chatter turn(s)")
         else:
             print(f"  w={w}: never closed within 7 turns")
+
+    # COUNTERFACTUAL — real measured token/turn (#004) × intentional-long valve-less baseline
+    print(f"\n{'='*74}\nCOUNTERFACTUAL — yield on a sprawling baseline")
+    print(f"(token/turn = {MEASURED_BILLABLE_INPUT_PER_TURN:,.0f}, measured #004; long baseline synthetic)\n{'='*74}")
+    report("intentional-long baseline (value front, 6 chatter turns)", LONG_BASELINE,
+           natural_close_idx=11, trigger="value")
+    print()
+    counterfactual(LONG_BASELINE, natural_idx=11, trigger="value")
