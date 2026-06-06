@@ -16,6 +16,8 @@ Multi-agent systems fail in production in three compounding ways — and the wor
 
 The dominant tooling is **reactive** (budget caps, circuit-breakers, dashboards) — it watches the meter after the fact. **Cairn is preventive:** it removes the structure that causes all three. Agents coordinate through a passive **append-only blackboard** with minimal per-agent context, not a shared conversation — so nothing is overwritten (every contribution is a durable, auditable trace), there is no thread to race in, and each agent carries a bounded view, not the whole transcript.
 
+See the silent-overwrite wound and Cairn's fix in 20 lines: `python examples/coordination_integrity_demo.py`.
+
 ## Three mechanisms (each measured in real operation)
 
 1. **Minimal-context workers** — each agent loads only a small task-scoped context, not the full project history. Measured: always-loaded context drops ~32K → ~0.8K tokens per agent-turn.
