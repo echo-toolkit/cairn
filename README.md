@@ -53,6 +53,20 @@ print(result.closed_reason, result.total_value())
 
 `python examples/selftest.py` runs an offline, dependency-free demo of the whole loop.
 
+### Already on LangChain / CrewAI?
+
+Coordinate your existing framework agents through Cairn's blackboard — minimal per-agent context instead of re-passing the full transcript:
+
+```python
+from cairn import run_swarm, Worker
+from cairn.adapters import from_langchain   # or: from_crewai, or as_worker_fn for any invoke()
+
+run_swarm(from_langchain(my_chat_model_or_graph),
+          [Worker("a", "angle A"), Worker("b", "angle B")])
+```
+
+`as_worker_fn(invoke)` wraps *any* `invoke(prompt) -> str` callable. The adapters import no framework until a wrapped agent runs (`pip install "cairn-coordination[langchain]"` / `[crewai]`). Offline demo: `python examples/adapter_demo.py`.
+
 ---
 
 ## Verifiable coordination (optional web3 layer)
