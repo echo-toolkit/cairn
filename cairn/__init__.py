@@ -24,7 +24,7 @@ from .core import Worker, WorkerContext, Gardener, SwarmResult, run_swarm, Agent
 # The concrete Celo adapter (cairn.web3.celo) lazy-imports web3.py; import it explicitly.
 from .web3 import Receipt, IdentityAdapter, ReceiptAdapter, PaymentAdapter, NullAdapter
 
-__version__ = "0.2.0.dev0"   # 0.2 line: web3 agent-economy layer (experimental, additive)
+__version__ = "0.2.0"   # 0.2 line: web3 agent-economy layer (experimental, additive)
 __all__ = [
     "Blackboard", "Trace", "ValveState", "TurnObs", "compute_R",
     "Worker", "WorkerContext", "Gardener", "SwarmResult", "run_swarm", "AgentFn",

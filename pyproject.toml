@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cairn"
+version = "0.2.0"
+description = "Token-efficient, verifiable multi-agent AI coordination — passive stigmergic blackboard + minimal per-agent context, with an optional on-chain (ERC-8004 identity + coordination receipts) layer."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "AGPL-3.0-or-later"
+authors = [{ name = "Tağmaç Çankaya" }]
+keywords = ["multi-agent", "agents", "llm", "coordination", "token-efficiency",
+            "blackboard", "stigmergy", "erc-8004", "celo", "web3", "agent-economy"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = []   # CORE is stdlib-only — `pip install cairn` stays dependency-free (by design).
+
+[project.optional-dependencies]
+web3 = ["web3>=7,<8", "eth-account"]            # `pip install cairn[web3]` for the on-chain layer
+dev  = ["web3>=7,<8", "eth-account", "py-solc-x", "eth-tester", "py-evm", "pytest"]
+
+[project.urls]
+Homepage = "https://github.com/echo-toolkit/cairn"
+Repository = "https://github.com/echo-toolkit/cairn"
+
+[tool.setuptools]
+packages = ["cairn", "cairn.web3"]
