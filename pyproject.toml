@@ -3,7 +3,7 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "cairn"
+name = "cairn-coordination"   # PyPI distribution name ("cairn" is taken); import stays `import cairn`
 version = "0.2.0"
 description = "Token-efficient, verifiable multi-agent AI coordination — passive stigmergic blackboard + minimal per-agent context, with an optional on-chain (ERC-8004 identity + coordination receipts) layer."
 readme = "README.md"

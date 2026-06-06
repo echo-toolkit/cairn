@@ -32,10 +32,10 @@ The throughput / rate-limit win persists even where prompt caching shrinks the d
 ## Quickstart
 
 ```bash
-pip install "git+https://github.com/echo-toolkit/cairn"            # core — stdlib-only, zero deps
-pip install "cairn[web3] @ git+https://github.com/echo-toolkit/cairn"   # + the on-chain layer
+pip install cairn-coordination          # core — stdlib-only, zero deps   (import name: cairn)
+pip install "cairn-coordination[web3]"   # + the on-chain layer (ERC-8004 identity + receipts)
 ```
-*(PyPI release — `pip install cairn` — coming.)*
+On [PyPI](https://pypi.org/project/cairn-coordination/) (the import name is `cairn`; `cairn` was taken).
 
 Framework-agnostic: you supply `agent_fn(ctx)` and make your own model call inside it. Cairn calls no LLM.
 
