@@ -1,6 +1,6 @@
 # Cairn 🪨
 
-**A free AGPLv3 coordination layer that lets multiple AI agents work together without burning the token budget — by coordinating through a passive shared blackboard and minimal per-agent context, instead of conversation. Optionally, it makes that coordination *verifiable* on-chain.**
+**A coordination layer for multi-agent AI systems — so your agents stop silently overwriting each other.** Agents converge on a passive, **append-only shared blackboard** (they leave traces; they never overwrite shared state), so multi-agent work stays **auditable and debuggable**, self-terminates instead of looping, and carries minimal per-agent context (≈ half the tokens). Optionally, that coordination is **verifiable on-chain**.
 
 > A *cairn* is a pile of stones travellers stack to mark a path for those behind — guidance left without speaking. That is Cairn's mechanism: agents leave traces, not messages.
 
@@ -8,9 +8,13 @@
 
 ## The problem
 
-Multi-agent AI systems fail in production mostly on **cost**: agents talk to each other in unbounded loops, each carrying the others' full transcripts, until the context — and the bill — explodes. The dominant tooling is **reactive** (budget caps, circuit-breakers, observability dashboards): it watches the meter and pulls the plug after the fact. It does not change the architecture that generates the spend.
+Multi-agent systems fail in production in three compounding ways — and the worst one is silent:
 
-**Cairn is preventive** — it removes the structure that causes the explosion.
+1. **Coordination corruption (the silent one).** When N agents write to shared state, last-write-wins quietly overwrites work; when something breaks you can't tell which agent, which step, or which stale value caused it. Teams keep hand-rolling an "append-only event log" to claw auditability back.
+2. **Unbounded chatter / loops.** Agents sharing a conversation thread race to add the last word and don't know when to stop.
+3. **Cost blow-up.** Each agent replays the full transcript; context — and the bill — explodes.
+
+The dominant tooling is **reactive** (budget caps, circuit-breakers, dashboards) — it watches the meter after the fact. **Cairn is preventive:** it removes the structure that causes all three. Agents coordinate through a passive **append-only blackboard** with minimal per-agent context, not a shared conversation — so nothing is overwritten (every contribution is a durable, auditable trace), there is no thread to race in, and each agent carries a bounded view, not the whole transcript.
 
 ## Three mechanisms (each measured in real operation)
 
@@ -18,9 +22,9 @@ Multi-agent AI systems fail in production mostly on **cost**: agents talk to eac
 2. **Passive stigmergic blackboard** — agents leave short traces (claims, findings, status) in one small shared file and read each other's traces. **No agent-to-agent conversation channel.** Coordination emerges from a shared filter, not chatter.
 3. **Gardener orchestrator** — a single supervisor that distills emergent findings and times the close (a resonance valve), intervening only on pathology, never micro-managing.
 
-## Measured result (dogfooded, controlled A/B)
+## Proof of mechanism (measured, controlled A/B)
 
-On an identical agent task — same model, only the context architecture changed:
+The token cut isn't the pitch — it's the *evidence* the structure works. On an identical agent task — same model, only the context architecture changed:
 
 | | naive full-context | minimal + blackboard | reduction |
 |---|---:|---:|---:|
