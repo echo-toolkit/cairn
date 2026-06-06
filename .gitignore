@@ -1,10 +1,27 @@
+# Python
 __pycache__/
 *.py[cod]
+*.egg-info/
+dist/
+build/
+
+# envs / secrets (never publish)
 .env
 .secrets.env
 venv/
 .venv/
-*.egg-info/
-dist/
-build/
+
+# build artifacts
+contracts/build/
+
+# OS
 .DS_Store
+
+# Operator-specific on-chain tooling — references a local secrets path; kept out of the public
+# library. The reusable code is cairn/web3/ + contracts/ + the offline examples.
+examples/celo_cycle.py
+examples/celo_identity.py
+examples/celo_payment.py
+scripts/deploy_receipts.py
+scripts/setup_sepolia.py
+scripts/inspect_registry.py

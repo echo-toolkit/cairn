@@ -1,6 +1,6 @@
 # Cairn 🪨
 
-**A free AGPLv3 coordination layer that lets multiple AI agents work together without burning the token budget — by coordinating through a passive shared blackboard and minimal per-agent context, instead of conversation.**
+**A free AGPLv3 coordination layer that lets multiple AI agents work together without burning the token budget — by coordinating through a passive shared blackboard and minimal per-agent context, instead of conversation. Optionally, it makes that coordination *verifiable* on-chain.**
 
 > A *cairn* is a pile of stones travellers stack to mark a path for those behind — guidance left without speaking. That is Cairn's mechanism: agents leave traces, not messages.
 
@@ -14,9 +14,9 @@ Multi-agent AI systems fail in production mostly on **cost**: agents talk to eac
 
 ## Three mechanisms (each measured in real operation)
 
-1. **Minimal-context workers** — each agent loads only a small task-scoped context, not the full project history. Measured: system-prompt/always-loaded context drops ~32K → ~0.8K tokens per agent-turn.
+1. **Minimal-context workers** — each agent loads only a small task-scoped context, not the full project history. Measured: always-loaded context drops ~32K → ~0.8K tokens per agent-turn.
 2. **Passive stigmergic blackboard** — agents leave short traces (claims, findings, status) in one small shared file and read each other's traces. **No agent-to-agent conversation channel.** Coordination emerges from a shared filter, not chatter.
-3. **Gardener orchestrator** — a single supervisor that distills emergent findings and intervenes only on pathology (a dead-end chase, a budget ceiling), never micro-manages.
+3. **Gardener orchestrator** — a single supervisor that distills emergent findings and times the close (a resonance valve), intervening only on pathology, never micro-managing.
 
 ## Measured result (dogfooded, controlled A/B)
 
@@ -29,15 +29,58 @@ On an identical agent task — same model, only the context architecture changed
 
 The throughput / rate-limit win persists even where prompt caching shrinks the dollar delta. The benchmark harness is published so the number is **reproducible — and falsifiable** — on your own workload.
 
-Emergent coordination — one agent binding to another's finding and converging to a verdict — was observed **with no conversation channel**, purely through the passive blackboard.
+## Quickstart
+
+Framework-agnostic: you supply `agent_fn(ctx)` and make your own model call inside it. Cairn calls no LLM.
+
+```python
+from cairn import run_swarm, Worker, Trace
+
+def agent_fn(ctx):
+    # ctx.task = this agent's scope; ctx.board = a compact digest of others' traces (minimal!)
+    # call your model, return a Trace — or return None to go idle (self-terminate)
+    return Trace(agent=ctx.agent, kind="finding", text="...", value=2.0)
+
+result = run_swarm(agent_fn, [Worker("a", "angle A"), Worker("b", "angle B")])
+print(result.closed_reason, result.total_value())
+```
+
+`python examples/selftest.py` runs an offline, dependency-free demo of the whole loop.
+
+---
+
+## Verifiable coordination (optional web3 layer)
+
+Token-efficiency commoditizes; **verifiability** does not. When agents owned by *different parties* coordinate, they need on-chain **identity**, **receipts**, and (optionally) **value rails**. Cairn adds these as an **additive, off-by-default layer** — `import cairn` stays dependency-free, and with no adapter the core runs exactly as before.
+
+```python
+from cairn import run_swarm, Worker
+from cairn.web3.celo import CeloEVMAdapter
+
+chain = CeloEVMAdapter(private_key=KEY, receipts_addr=RECEIPTS)
+run_swarm(agent_fn, workers, receipt=chain)   # emits one verifiable on-chain receipt per run
+```
+
+- **Receipts** — one verifiable on-chain record per coordination run (run id + state hash).
+- **Identity** — each agent gets a verifiable identity via the pre-deployed **[ERC-8004](https://eips.ethereum.org/EIPS/eip-8004)** registries (identity is config, not a deploy).
+- **Payment** — optional native-CELO / ERC-20 (cUSD, USDC) transfers between agents.
+
+**Live on Celo mainnet** (independently verifiable):
+
+| Capability | Proof |
+|---|---|
+| Coordination receipt | [tx `0xeea84ea9…`](https://celoscan.io/tx/0xeea84ea902a1c6a26ca484a4b53d22e951d976cb2299fccd284688e890a9deec) |
+| Agent identity (ERC-8004) | [agentId 9211](https://celoscan.io/token/0x8004A169FB4a3325136EB29fA0ceB6D2e539a432?a=9211) |
+
+The chain layer is chain-agnostic by design (a clean adapter interface); Celo/EVM is the first implementation.
 
 ---
 
 ## Status
 
-**Skeleton repository.** Cairn is being extracted as a reusable library from the originating operator's own multi-agent swarm. Full v1 code lands when funding (NGI Zero Commons or alternative) is secured. This repo currently carries the design, the measured benchmark, and the public commitment.
+The core library (blackboard + minimal-context workers + gardener/valve) and the verifiable-coordination layer are **here and working** — receipts + identity proven on Celo mainnet, payment on testnet. Funding (NGI Zero Commons / alternatives) is in progress to sustain maintenance.
 
-- Framework-agnostic — designed to coordinate agents built on LangGraph / CrewAI / a plain script.
+- Framework-agnostic — coordinates agents built on LangGraph / CrewAI / a plain script.
 - Composes with cost tooling (LiteLLM, Langfuse) — Cairn lowers the baseline they cap/observe.
 - Sibling of [Echo Toolkit](https://github.com/echo-toolkit/echo) — same operator, same commons philosophy, independent projects.
 
