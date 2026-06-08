@@ -18,6 +18,8 @@ The dominant tooling is **reactive** (budget caps, circuit-breakers, dashboards)
 
 See the silent-overwrite wound and Cairn's fix in 20 lines: `python examples/coordination_integrity_demo.py`.
 
+> Deep dive: [**Why your multi-agent system silently corrupts its shared state** — and why observability catches it too late](docs/why-multi-agent-systems-corrupt-shared-state.md).
+
 ## Three mechanisms (each measured in real operation)
 
 1. **Minimal-context workers** — each agent loads only a small task-scoped context, not the full project history. Measured: always-loaded context drops ~32K → ~0.8K tokens per agent-turn.
