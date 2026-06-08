@@ -16,7 +16,7 @@ Multi-agent systems fail in production in three compounding ways — and the wor
 
 The dominant tooling is **reactive** (budget caps, circuit-breakers, dashboards) — it watches the meter after the fact. **Cairn is preventive:** it removes the structure that causes all three. Agents coordinate through a passive **append-only blackboard** with minimal per-agent context, not a shared conversation — so nothing is overwritten (every contribution is a durable, auditable trace), there is no thread to race in, and each agent carries a bounded view, not the whole transcript.
 
-See the silent-overwrite wound and Cairn's fix in 20 lines: `python examples/coordination_integrity_demo.py`.
+See the silent-overwrite wound and Cairn's fix in ~20 lines: `python examples/coordination_integrity_demo.py` (in the cloned repo).
 
 > Deep dive: [**Why your multi-agent system silently corrupts its shared state** — and why observability catches it too late](docs/why-multi-agent-systems-corrupt-shared-state.md).
 
@@ -59,7 +59,7 @@ result = run_swarm(agent_fn, [Worker("a", "angle A"), Worker("b", "angle B")])
 print(result.closed_reason, result.total_value())
 ```
 
-`python examples/selftest.py` runs an offline, dependency-free demo of the whole loop.
+The snippet above runs from a bare `pip install` — no clone, no LLM, no keys. The offline demos (`python examples/selftest.py`, and the silent-overwrite walkthrough `examples/coordination_integrity_demo.py`) live in the repo: `git clone https://github.com/echo-toolkit/cairn` to run them.
 
 ### Already on LangChain / CrewAI?
 
