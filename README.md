@@ -1,6 +1,6 @@
 # Cairn 🪨
 
-**A coordination layer for multi-agent AI systems — so your agents stop silently overwriting each other.** Agents converge on a passive, **append-only shared blackboard** (they leave traces; they never overwrite shared state), so multi-agent work stays **auditable and debuggable**, self-terminates instead of looping, and carries minimal per-agent context (≈ half the tokens). Optionally, that coordination is **verifiable on-chain**.
+**A coordination layer for multi-agent AI systems — so your agents stop silently overwriting each other.** Agents converge on a passive, **append-only shared blackboard** (they leave traces; they never overwrite shared state), so multi-agent work stays **auditable and debuggable**, self-terminates instead of looping, and carries minimal per-agent context (≈ half the tokens). Optionally, that coordination is **verifiable on-chain** — the coordination and receipt layer for **agentic payments**.
 
 > A *cairn* is a pile of stones travellers stack to mark a path for those behind — guidance left without speaking. That is Cairn's mechanism: agents leave traces, not messages.
 
@@ -99,6 +99,10 @@ run_swarm(agent_fn, workers, receipt=chain)   # emits one verifiable on-chain re
 | Agent identity (ERC-8004) | [agentId 9211](https://celoscan.io/token/0x8004A169FB4a3325136EB29fA0ceB6D2e539a432?a=9211) |
 
 The chain layer is chain-agnostic by design (a clean adapter interface); Celo/EVM is the first implementation.
+
+### Agentic payments
+
+As autonomous agents begin paying each other — **x402**, AP2, Bedrock AgentCore Payments — the payment *execution* is increasingly a solved problem. What multi-agent payment workflows still lack is an auditable record of *what was coordinated, by whom, and why* around each payment. That is Cairn's role: agents converge on the append-only blackboard, and each run emits a verifiable on-chain receipt (run id + state hash) with ERC-8004 identity — so a coordinated job and its payment become **one verifiable record**. The optional payment adapter (Celo cUSD / USDC) ties value to the run. Cairn **complements** payment protocols like x402; it is not one.
 
 ---
 
