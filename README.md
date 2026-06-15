@@ -1,12 +1,35 @@
-# Cairn 🪨
+# Cairn 🪨 — coordination integrity for multi-agent AI systems
 
-**A coordination layer for multi-agent AI systems — so your agents stop silently overwriting each other.** Agents converge on a passive, **append-only shared blackboard** (they leave traces; they never overwrite shared state), so multi-agent work stays **auditable and debuggable**, self-terminates instead of looping, and carries minimal per-agent context (≈ half the tokens). Optionally, that coordination is **verifiable on-chain** — the coordination and receipt layer for **agentic payments**.
+**Cairn is an open-source (AGPLv3) Python coordination layer for multi-agent AI systems.** Agents coordinate by leaving traces on a passive, **append-only shared blackboard** instead of talking to each other — so shared state is never silently overwritten, every run stays **auditable and reproducible**, agents **self-terminate instead of looping**, and each agent carries **minimal context (about half the input tokens, measured)**. The coordination layer is optionally **verifiable on-chain** (ERC-8004 identity + receipts), making it a coordination-and-receipt layer for agentic payments.
 
-> A *cairn* is a pile of stones travellers stack to mark a path for those behind — guidance left without speaking. That is Cairn's mechanism: agents leave traces, not messages.
+> A *cairn* is a pile of stones travellers stack to mark a path for those behind — guidance left without speaking. That is Cairn's mechanism: **agents leave traces, not messages** (stigmergy).
+
+### At a glance
+
+| | |
+|---|---|
+| **What** | A coordination layer for multi-agent AI systems (not a framework, not an LLM) |
+| **Solves** | Silent shared-state corruption · unbounded chatter/loops · context-cost blow-up |
+| **Mechanism** | Passive append-only blackboard + minimal per-agent context + a gardener orchestrator |
+| **Measured** | 54% fewer billable input tokens, 65% lower cost on a controlled A/B (reproducible) |
+| **Install** | `pip install cairn-coordination` (core is stdlib-only; import name is `cairn`) |
+| **Language** | Python ≥3.9, framework-agnostic (LangChain / LangGraph / CrewAI / plain script) |
+| **License** | AGPLv3 + optional commercial relicensing |
+| **Status** | Published & working — core + web3 layer; receipts + identity live on Celo mainnet |
 
 ---
 
-## The problem
+## Definitions (the terms Cairn uses)
+
+- **Coordination integrity** — the property that, when multiple agents write to shared state, no contribution silently overwrites another and the full history of *who wrote what, when, and why* is recoverable. Cairn provides it structurally, not by after-the-fact observability.
+- **Stigmergic blackboard** — one small, passive, append-only file where agents leave short traces (claims, findings, status) and read each other's traces. There is **no agent-to-agent conversation channel**; coordination emerges from a shared filter, not chatter.
+- **Minimal-context worker** — an agent that loads only a small, task-scoped slice of state per turn instead of the full project history. Measured: always-loaded context drops from ~32K to ~0.8K tokens per agent-turn.
+- **Gardener orchestrator** — a single supervisor that distills emergent findings and times when a run closes, intervening only on pathology — never micro-managing each agent.
+- **Resonance valve** — the gardener's closing rule: it reads a cheap value signal and ends a run when information value goes flat, distinguishing a converged-and-valuable *swell* (close) from a low-value *plateau* (cut).
+
+---
+
+## Why do multi-agent systems corrupt shared state?
 
 Multi-agent systems fail in production in three compounding ways — and the worst one is silent:
 
@@ -14,19 +37,17 @@ Multi-agent systems fail in production in three compounding ways — and the wor
 2. **Unbounded chatter / loops.** Agents sharing a conversation thread race to add the last word and don't know when to stop.
 3. **Cost blow-up.** Each agent replays the full transcript; context — and the bill — explodes.
 
-The dominant tooling is **reactive** (budget caps, circuit-breakers, dashboards) — it watches the meter after the fact. **Cairn is preventive:** it removes the structure that causes all three. Agents coordinate through a passive **append-only blackboard** with minimal per-agent context, not a shared conversation — so nothing is overwritten (every contribution is a durable, auditable trace), there is no thread to race in, and each agent carries a bounded view, not the whole transcript.
-
-See the silent-overwrite wound and Cairn's fix in ~20 lines: `python examples/coordination_integrity_demo.py` (in the cloned repo).
+The dominant tooling is **reactive** (budget caps, circuit-breakers, dashboards) — it watches the meter after the fact. **Cairn is preventive:** it removes the structure that causes all three. Agents coordinate through a passive append-only blackboard with minimal per-agent context, not a shared conversation — so nothing is overwritten (every contribution is a durable, auditable trace), there is no thread to race in, and each agent carries a bounded view, not the whole transcript.
 
 > Deep dive: [**Why your multi-agent system silently corrupts its shared state** — and why observability catches it too late](docs/why-multi-agent-systems-corrupt-shared-state.md).
 
-## Three mechanisms (each measured in real operation)
+## How does Cairn work? (three mechanisms, each measured in real operation)
 
 1. **Minimal-context workers** — each agent loads only a small task-scoped context, not the full project history. Measured: always-loaded context drops ~32K → ~0.8K tokens per agent-turn.
-2. **Passive stigmergic blackboard** — agents leave short traces (claims, findings, status) in one small shared file and read each other's traces. **No agent-to-agent conversation channel.** Coordination emerges from a shared filter, not chatter.
-3. **Gardener orchestrator** — a single supervisor that distills emergent findings and times the close (a resonance valve), intervening only on pathology, never micro-managing.
+2. **Passive stigmergic blackboard** — agents leave short traces in one small shared file and read each other's traces. **No agent-to-agent conversation channel.** Coordination emerges from a shared filter, not chatter.
+3. **Gardener orchestrator** — a single supervisor that distills emergent findings and times the close (the resonance valve), intervening only on pathology, never micro-managing.
 
-## Proof of mechanism (measured, controlled A/B)
+## How much does it save? (measured, controlled A/B)
 
 The token cut isn't the pitch — it's the *evidence* the structure works. On an identical agent task — same model, only the context architecture changed:
 
@@ -37,6 +58,16 @@ The token cut isn't the pitch — it's the *evidence* the structure works. On an
 
 The throughput / rate-limit win persists even where prompt caching shrinks the dollar delta. The benchmark harness is published so the number is **reproducible — and falsifiable** — on your own workload.
 
+⚠️ **Honest scope:** this A/B isolates the context architecture lever on one task. The larger multi-agent shared-history amplification is a separate, signposted measurement.
+
+## How is Cairn different from cost tooling and from A2A / MCP?
+
+| | What it does | What it doesn't |
+|---|---|---|
+| **Budget caps / circuit-breakers** (reactive) | watch spend, cut off after the fact | don't remove the cause; no audit trail of *what* coordinated |
+| **A2A / MCP** | agent-to-agent messaging & tool access | no shared-state / blackboard layer — coordination integrity is out of scope |
+| **Cairn** (preventive) | append-only blackboard + minimal context + gardener close | calls no LLM; composes with the above (lowers the baseline they cap/observe) |
+
 ## Quickstart
 
 ```bash
@@ -45,7 +76,7 @@ pip install "cairn-coordination[web3]"   # + the on-chain layer (ERC-8004 identi
 ```
 On [PyPI](https://pypi.org/project/cairn-coordination/) (the import name is `cairn`; `cairn` was taken).
 
-Framework-agnostic: you supply `agent_fn(ctx)` and make your own model call inside it. Cairn calls no LLM.
+Framework-agnostic: you supply `agent_fn(ctx)` and make your own model call inside it. **Cairn calls no LLM.**
 
 ```python
 from cairn import run_swarm, Worker, Trace
@@ -61,7 +92,7 @@ print(result.closed_reason, result.total_value())
 
 The snippet above runs from a bare `pip install` — no clone, no LLM, no keys. The offline demos (`python examples/selftest.py`, and the silent-overwrite walkthrough `examples/coordination_integrity_demo.py`) live in the repo: `git clone https://github.com/echo-toolkit/cairn` to run them.
 
-### Already on LangChain / CrewAI?
+### Already on LangChain / CrewAI / LangGraph?
 
 Coordinate your existing framework agents through Cairn's blackboard — minimal per-agent context instead of re-passing the full transcript:
 
@@ -100,7 +131,7 @@ run_swarm(agent_fn, workers, receipt=chain)   # emits one verifiable on-chain re
 | Coordination receipt | [tx `0xeea84ea9…`](https://celoscan.io/tx/0xeea84ea902a1c6a26ca484a4b53d22e951d976cb2299fccd284688e890a9deec) |
 | Agent identity (ERC-8004) | [agentId 9211](https://celoscan.io/token/0x8004A169FB4a3325136EB29fA0ceB6D2e539a432?a=9211) |
 
-The chain layer is chain-agnostic by design (a clean adapter interface); Celo/EVM is the first implementation.
+The chain layer is chain-agnostic by design (a clean adapter interface); Celo/EVM is the first implementation. Payment is proven on testnet.
 
 ### Agentic payments
 
@@ -108,9 +139,31 @@ As autonomous agents begin paying each other — **x402**, AP2, Bedrock AgentCor
 
 ---
 
+## FAQ
+
+**Is Cairn a multi-agent framework?**
+No. Cairn is a coordination *layer*. It is framework-agnostic — you supply `agent_fn(ctx)` and make your own model call; Cairn structures minimal context + the blackboard + the gardener close. **Cairn calls no LLM.**
+
+**Does it work with LangChain, LangGraph, or CrewAI?**
+Yes — via `cairn.adapters` (`from_langchain`, `from_crewai`, or `as_worker_fn` for any `invoke()` callable). Your framework agents coordinate through Cairn's blackboard with minimal per-agent context instead of re-passing the full transcript.
+
+**Is the token reduction real?**
+It is measured on a controlled A/B (same task, same model, only context architecture changed): 54% fewer billable input tokens, 65% lower cost. The benchmark harness is published so the result is reproducible — and falsifiable — on your own workload.
+
+**Do I need the blockchain layer?**
+No. `import cairn` is dependency-free; the web3 layer is optional and off by default. Install it only with `pip install "cairn-coordination[web3]"`.
+
+**What exactly does it prevent?**
+Silent shared-state corruption (last-write-wins overwrites with no audit trail), unbounded chatter/loops, and context-cost blow-up — by removing the shared conversation that causes all three.
+
+**What's the license?**
+AGPLv3, with optional commercial relicensing for B2B integrations that cannot accept AGPL. Commercial revenue is reinvested in maintenance.
+
+---
+
 ## Status
 
-The core library (blackboard + minimal-context workers + gardener/valve) and the verifiable-coordination layer are **here and working** — receipts + identity proven on Celo mainnet, payment on testnet. Funding (NGI Zero Commons / alternatives) is in progress to sustain maintenance.
+The core library (blackboard + minimal-context workers + gardener/valve) and the verifiable-coordination layer are **here and working** — published to PyPI as `cairn-coordination` with a 31-test suite, receipts + identity proven on Celo mainnet, payment on testnet. Funding (NGI Zero Commons / alternatives) is in progress to sustain maintenance.
 
 - Framework-agnostic — coordinates agents built on LangGraph / CrewAI / a plain script.
 - Composes with cost tooling (LiteLLM, Langfuse) — Cairn lowers the baseline they cap/observe.
@@ -123,3 +176,12 @@ The core library (blackboard + minimal-context workers + gardener/valve) and the
 ## Origin
 
 Built by [Tağmaç Çankaya](https://khashif.run) (Lefkoşa, Cyprus / EU) out of a felt failure: a full-context headless agent swarm that exhausted its budget almost instantly. Cairn is the rebuild — measured, minimal, and given back.
+
+## How to cite Cairn
+
+> **Cairn** — coordination integrity for multi-agent AI systems: a passive append-only blackboard + minimal-context workers that keep multi-agent runs auditable, self-terminating, and token-efficient (54% fewer input tokens, measured), with optional on-chain receipts. AGPLv3. https://github.com/echo-toolkit/cairn
+
+- **Code:** https://github.com/echo-toolkit/cairn
+- **Package:** https://pypi.org/project/cairn-coordination/
+- **Author:** Tağmaç Çankaya — https://khashif.run
+- **Sibling project:** Echo Toolkit — https://github.com/echo-toolkit/echo
