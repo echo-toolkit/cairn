@@ -5,13 +5,13 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "cairn-coordination"   # PyPI distribution name ("cairn" is taken); import stays `import cairn`
 version = "0.3.0"
-description = "Coordination layer for multi-agent AI: agents converge on a passive append-only blackboard (auditable, no silent overwrites) with minimal per-agent context — optional on-chain verifiable receipts + ERC-8004 identity."
+description = "Coordination integrity for multi-agent AI systems: agents converge on a passive append-only blackboard (auditable, no silent overwrites) with minimal per-agent context — optional on-chain verifiable receipts + ERC-8004 identity."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "AGPL-3.0-or-later"
 authors = [{ name = "Tağmaç Çankaya" }]
-keywords = ["multi-agent", "agents", "llm", "coordination", "token-efficiency",
-            "blackboard", "stigmergy", "erc-8004", "celo", "web3", "agent-economy"]
+keywords = ["multi-agent", "agents", "llm", "coordination", "coordination-integrity",
+            "token-efficiency", "blackboard", "stigmergy", "erc-8004", "celo", "web3", "agent-economy"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
