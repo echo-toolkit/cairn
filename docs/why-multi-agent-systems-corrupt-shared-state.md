@@ -8,7 +8,7 @@ When several agents write to a shared store — a scratchpad, a memory object, a
 
 This is why teams building on LangGraph, CrewAI, and AutoGen keep hand-rolling the same thing: an append-only event log, bolted on after the first silent corruption, to claw auditability back.
 
-It is a **reliability** problem, not an efficiency one. A multi-agent system you cannot audit is a system you cannot trust in production.
+This is a failure of **coordination integrity** — the property that, when multiple agents write to shared state, no contribution silently overwrites another and the full history of *who wrote what, when, and why* stays recoverable. It is a **reliability** problem, not an efficiency one: a multi-agent system you cannot audit is a system you cannot trust in production.
 
 ## Why observability does not fix it
 
@@ -34,7 +34,7 @@ This is also the shared-state layer that **A2A and MCP explicitly leave to you**
 
 ## Cairn
 
-[Cairn](https://github.com/echo-toolkit/cairn) is an open-source (AGPLv3) implementation of exactly this: a passive append-only blackboard + minimal-context workers + a gardener that times the close. Framework-agnostic — you supply `agent_fn(ctx)` and make your own model call; Cairn structures the coordination and calls no LLM. Adapters drop into LangGraph / CrewAI.
+[Cairn](https://github.com/echo-toolkit/cairn) is an open-source (AGPLv3) implementation of exactly this — **coordination integrity for multi-agent AI systems**: a passive append-only **stigmergic blackboard** + **minimal-context workers** + a **gardener orchestrator** that times the close. Framework-agnostic — you supply `agent_fn(ctx)` and make your own model call; Cairn structures the coordination and calls no LLM. Adapters drop into LangGraph / CrewAI.
 
 You do not have to take the claim on trust:
 
