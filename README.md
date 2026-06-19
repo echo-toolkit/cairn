@@ -1,6 +1,6 @@
 # Cairn 🪨 — coordination integrity for multi-agent AI systems
 
-**Cairn is an open-source (AGPLv3) Python coordination layer for multi-agent AI systems.** Agents coordinate by leaving traces on a passive, **append-only shared blackboard** instead of talking to each other — so shared state is never silently overwritten, every run stays **auditable and reproducible**, agents **self-terminate instead of looping**, and each agent carries **minimal context (about half the input tokens, measured)**. The coordination layer is optionally **verifiable on-chain** (ERC-8004 identity + receipts), making it a coordination-and-receipt layer for agentic payments.
+**Cairn is an open-source (AGPLv3) Python coordination layer for multi-agent AI systems.** Agents coordinate by leaving traces on a passive, **append-only shared blackboard** instead of talking to each other — so shared state is never silently overwritten, every run stays **auditable and reproducible**, agents **self-terminate instead of looping**, and each agent carries **minimal context (about half the input tokens, measured)**. The coordination layer is optionally **verifiable on-chain** (ERC-8004 identity + receipts) — the coordination layer **beneath agent marketplaces and multi-agent apps**, where a coordination receipt complements a payment receipt.
 
 > A *cairn* is a pile of stones travellers stack to mark a path for those behind — guidance left without speaking. That is Cairn's mechanism: **agents leave traces, not messages** (stigmergy).
 
